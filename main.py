@@ -1,8 +1,6 @@
-# Pedir el nombre del jugador
-nombre_jugador = input("Introduce tu nombre: ")
+from laberinto import Laberinto
 
-# Mensaje de bienvenida
-print(f"""===========================================
-¡Bienvenido al juego del laberinto, {nombre_jugador.upper()}!
-============================================
-""")
+
+juego = Laberinto()
+juego.jugar()
+
