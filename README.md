@@ -6,9 +6,11 @@ El objetivo es moverse desde el punto de inicio hasta la salida, evitando obstá
 
 ## Cómo jugar
 
--->El jugador puede moverse usando las teclas de flecha de su teclado. 
--->El mapa representa las paredes con el carácter `#`, los pasillos con `.` y el personaje con `P`.
--->Sobrevives si llegas hasta el final.
+-->El jugador puede moverse usando las teclas en su teclado. 
+-->El mapa representa las paredes con el carácter `#`, los pasillos con `.`, el personaje con `P` y el final con ´E´.
+--> si tocas pared fallas, pero puedes volver a empezar.
+--> he añadido 5 mapas.
+--> Sobrevives si llegas hasta el final.
 
 ### Agradecimiento
-Gracias por jugar, espero te hallas divertido.
+Gracias por jugar, espero te diviertas.
