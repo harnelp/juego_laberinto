@@ -1,6 +1,6 @@
 from laberinto import Laberinto
 
 
-juego = Laberinto()
-juego.jugar()
+juego = Laberinto(1)
+juego.iniciar_juego()
 

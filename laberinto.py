@@ -1,38 +1,18 @@
 import os
 import readchar
 
-
 class Laberinto:
 
-    def __init__(self):
-        self.nombre_jugador = input("Por favor, introduce tu nombre: ")
-        print(f"\n¡Hola, {self.nombre_jugador}! Bienvenido al juego del laberinto.\n")
-        self._inicializar_laberinto()
+    def __init__(self, nivel):
+        self.nivel = nivel
+        self._cargar_laberinto()
         self.posicion_jugador = self._encontrar_jugador()
 
-    def _inicializar_laberinto(self):
-        """Define el laberinto inicial."""
-        self.laberinto = [
-            ["#", "#", "#", "#", "#", "#", "#", "#", "#"],
-            ["#", "P", ".", ".", ".", ".", ".", ".", "#"],
-            ["#", "#", "#", ".", "#", "#", "#", ".", "#"],
-            ["#", ".", ".", ".", ".", ".", "#", ".", "#"],
-            ["#", ".", "#", "#", "#", ".", "#", "#", "#"],
-            ["#", ".", "#", ".", ".", ".", ".", ".", "#"],
-            ["#", ".", "#", "#", "#", "#", "#", ".", "#"],
-            ["#", ".", ".", ".", ".", ".", ".", ".", "#"],
-            ["#", "#", "#", "#", ".", "#", "#", "#", "#"],
-            ["#", ".", ".", ".", ".", ".", ".", ".", "#"],
-            ["#", ".", "#", "#", ".", "#", "#", "#", "#"],
-            ["#", ".", "#", "#", ".", ".", "#", "#", "#"],
-            ["#", ".", "#", "#", "#", ".", ".", "#", "#"],
-            ["#", ".", "#", "#", "#", ".", ".", "#", "#"],
-            ["#", ".", ".", ".", "#", "#", ".", "#", "#"],
-            ["#", ".", "#", ".", "#", "#", ".", ".", "#"],
-            ["#", ".", "#", ".", ".", "#", "#", ".", "#"],
-            ["#", "#", "#", "#", "#", "#", "#", ".", "E"]
-
-        ]
+    def _cargar_laberinto(self):
+        """Carga el laberinto desde un archivo de texto."""
+        nombre_archivo = f"niveles/map{self.nivel}.txt"
+        with open(nombre_archivo, 'r') as archivo:
+            self.laberinto = [list(linea.strip()) for linea in archivo.readlines()]
 
     def _encontrar_jugador(self):
         """Encuentra y devuelve la posición del jugador en el laberinto."""
@@ -47,18 +27,6 @@ class Laberinto:
         for fila in self.laberinto:
             print(" ".join(fila))
         print("\n")
-
-    def fin_del_juego(self, mensaje):
-        """Maneja el fin del juego, mostrando un mensaje y pregunta si se desea reiniciar."""
-        print(mensaje)
-        decision = input(f"{self.nombre_jugador}, ¿quieres jugar de nuevo? (Sí/No) (y/n): ").lower()
-        if decision == "s" or decision == "si" or decision == "y":
-            self._inicializar_laberinto()
-            self.posicion_jugador = self._encontrar_jugador()
-            self.jugar()
-        else:
-            print(f"\n ¡ Gracias por jugar, {self.nombre_jugador} ! Hasta pronto.")
-            exit()
 
     def mover(self, direccion):
         """Intenta mover al jugador en la dirección dada."""
@@ -79,9 +47,10 @@ class Laberinto:
         # Verificar la meta o pared
         if self.laberinto[nuevo_x][nuevo_y] == "E":
             self.mostrar_laberinto()
-            self.fin_del_juego("¡Felicidades! Has ganado.")
+            return True  # Indicar que se ha alcanzado el final
         elif self.laberinto[nuevo_x][nuevo_y] == "#":
-            self.fin_del_juego("\n¡Game Over! Has tocado una pared.")
+            self.mostrar_laberinto()
+            return False  # Indicar que se ha tocado una pared
 
         # Si es un espacio vacío, mover al jugador
         if self.laberinto[nuevo_x][nuevo_y] == ".":
@@ -89,20 +58,44 @@ class Laberinto:
             self.posicion_jugador = (nuevo_x, nuevo_y)
             self.mostrar_laberinto()
 
-    def jugar(self):
-        """Ejecuta el bucle principal del juego."""
-        self.mostrar_laberinto()
-        print("Mueve con las teclas (w a s d) o 'e' para finalizar.")
-        while True:
-            movimiento = readchar.readkey()
+        return None  # Indicar que el juego continúa
 
-            # Mapea las teclas w, a, s, d a las direcciones
-            direcciones = {'w': '↑', 's': '↓', 'a': '←', 'd': '→'}
+    def iniciar_juego(self):
+        self.nombre_jugador = input("Por favor, introduce tu nombre: ")
+        print(f"\n¡Hola, {self.nombre_jugador}! Bienvenido al juego del laberinto.\n")
+        
+        nivel_actual = 1
+        max_niveles = 5  # Suponiendo que tienes 5 niveles
 
-            if movimiento in direcciones:
-                self.mover(direcciones[movimiento])
-            elif movimiento == 'e':  # Usamos 'e' para salir
-                print("\n¡Gracias por jugar! Hasta pronto.")
-                break
+        while nivel_actual <= max_niveles:
+            juego = Laberinto(nivel_actual)
+            juego.mostrar_laberinto()
+            print("Mueve con las teclas (w a s d) o 'e' para finalizar.")
+
+            while True:
+                movimiento = readchar.readkey()
+
+                # Mapea las teclas w, a, s, d a las direcciones
+                direcciones = {'w': '↑', 's': '↓', 'a': '←', 'd': '→'}
+
+                if movimiento in direcciones:
+                    resultado = juego.mover(direcciones[movimiento])
+                    if resultado is not None:
+                        break
+                elif movimiento == 'e':  # Usamos 'e' para salir
+                    print("\n¡Gracias por jugar! Hasta pronto.")
+                    return
+                else:
+                    print("\nTecla no válida. Usa w, a, s, d para mover o 'e' para salir.")
+
+            if resultado:
+                print("¡Felicidades! Has completado este nivel.")
+                nivel_actual += 1
             else:
-                print("\nTecla no válida. Usa w, a, s, d para mover o 'e' para salir.")
+                print("\n¡Game Over! Has tocado una pared.")
+                decision = input(f"{self.nombre_jugador}, ¿quieres intentar de nuevo este nivel? (y/n): ").lower()
+                if decision != "s" and decision != "y":
+                    print(f"\n¡Gracias por jugar, {self.nombre_jugador}! Hasta pronto.")
+                    return
+
+        print("¡Felicidades! Has completado todos los niveles.")
